@@ -20,3 +20,8 @@ test-result
 server.pid
 *.iml
 *.eml
+
+# Eclipse files
+.project
+.classpath
+.settings/
