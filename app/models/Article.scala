@@ -1,18 +1,26 @@
 package models
 
+import play.api.data._
+import play.api.data.Forms._
+import play.api.libs.json._
+
 case class Article(
   title: String,
   description: String)
 
-object JsonFormats {
-  import play.api.libs.json.Json
-  import play.api.data._
-  import play.api.data.Forms._
+object Article {
 
-  implicit val articleFormat = Json.format[Article]
+  // Factory for creating objects from JSON
+  def apply(json: JsValue): Article = {
+    Article(
+      title = (json \ "title").as[String],
+      description = (json \ "description").as[String])
+  }
 
-  val articleForm = Form(
+  // Form object
+  val articleForm: Form[Article] = Form(
     mapping(
-      "title" -> text,
-      "description" -> text)(Article.apply _)(Article.unapply _))
+      "title" -> nonEmptyText,
+      "description" -> nonEmptyText)(Article.apply)(Article.unapply))
+
 }

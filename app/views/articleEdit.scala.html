@@ -1,0 +1,27 @@
+@(articleForm: Form[Article])
+
+@import helper._
+
+@main(title = "Edit Article") {
+
+    <h1>Edit Article</h1>
+
+    @form(action = routes.Application.articleSave, args = 'id -> "articleform") {
+
+        @inputText(
+            field = articleForm("title"),
+            args = '_label -> "Title", 'placeholder -> "Enter title"
+        )
+
+        @inputText(
+            field = articleForm("description"),
+            args = '_label -> "Description", 'placeholder -> "Enter description"
+        )
+
+        <p class="buttons">
+            <input type="submit" id="submit">
+        <p>
+
+    }
+
+}
