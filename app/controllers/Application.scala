@@ -1,48 +1,42 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
-import play.api.libs.json._
 import scala.concurrent.Future
-import reactivemongo.api._
-import play.modules.reactivemongo.MongoController
-import play.modules.reactivemongo.json.collection.JSONCollection
+
+import dao.Articles
 import models.Article
+import play.api.libs.json.Json
+import play.api.libs.json.Json.toJsFieldJsValueWrapper
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.modules.reactivemongo.MongoController
 
 object Application extends Controller with MongoController {
 
-  /* 
-   * Get a JSONCollection (a Collection implementation that is designed to 
-   * work with JsObject, Reads and Writes.) Note that the `collection` 
-   * is not a "val", but a "def". We do _not_ store the collection reference 
-   * to avoid potential problems in development with Play hot-reloading. 
-   */
-  def articlesCollection: JSONCollection = db.collection[JSONCollection]("articles")
-
+  // HTML request: Get front page
   def index = Action {
     Ok(views.html.index("Mongo app is running"))
   }
 
+  // REST request: get single article by ID
   def findById(id: String) = Action.async {
-    val query = Json.obj("_id" -> Json.obj("$oid" -> id))
-    val futureItem = articlesCollection.find(query).one[JsValue]
-
+    val futureItem = Articles.findById(id)
+    
     futureItem.map {
-      case Some(item) => Ok(views.html.article(Article(item)))
+      case Some(article) => Ok(views.html.article(article))
       case None => NotFound(Json.obj("message" -> "No such item"))
     }
   }
 
+  // HTML request: Get edit form
   def articleEdit = Action {
     Ok(views.html.articleEdit(Article.articleForm))
   }
 
-  def articleSave = Action { implicit request =>
-    val boundForm =  Article.articleForm.bindFromRequest
+  def articleSave = Action.async { implicit request =>
+    val boundForm = Article.articleForm.bindFromRequest
 
-    Article.articleForm.bindFromRequest.fold(
-      errors => BadRequest(views.html.index("Error")),
-      article => Ok)
+    
+    Future(Ok(views.html.index("Saved")))
   }
 
 }

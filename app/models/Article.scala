@@ -14,7 +14,7 @@ object Article {
   def apply(json: JsValue): Article = {
     Article(
       title = (json \ "title").as[String],
-      description = (json \ "description").as[String])
+      description = (json \ "description").asOpt[String].getOrElse(""))
   }
 
   // Form object
