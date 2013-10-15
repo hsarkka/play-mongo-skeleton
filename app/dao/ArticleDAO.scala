@@ -11,7 +11,7 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.collection.JSONCollection
 
-object Articles extends BaseDAO {
+object ArticleDAO extends BaseDAO {
 
   /* 
    * Get a JSONCollection (a Collection implementation that is designed to 

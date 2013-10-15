@@ -2,7 +2,7 @@ package controllers
 
 import scala.concurrent.Future
 
-import dao.Articles
+import dao.ArticleDAO
 import models.Article
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
@@ -19,9 +19,9 @@ object Application extends Controller with MongoController {
 
   // REST request: get single article by ID
   def findById(id: String) = Action.async {
-    val futureItem = Articles.findById(id)
+    val futArticle = ArticleDAO.findById(id)
     
-    futureItem.map {
+    futArticle.map {
       case Some(article) => Ok(views.html.article(article))
       case None => NotFound(Json.obj("message" -> "No such item"))
     }
