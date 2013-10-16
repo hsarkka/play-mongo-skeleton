@@ -21,21 +21,27 @@ object ArticleDAO extends BaseDAO {
    */
   def articlesCollection: JSONCollection = db.collection[JSONCollection]("articles")
 
-  // Get single article by ID
+  /**
+   * Retrieves a single article by ID.
+   */
   def findById(id: String): Future[Option[Article]] = {
     // DB query
     val query = Json.obj("_id" -> Json.obj("$oid" -> id))
     val jsValueOptFut = articlesCollection.find(query).one[JsValue]
 
-    // Convert JSON object to model object
+    // Convert (possible) JSON object to model object
     jsValueOptFut.map {
-      case Some(jsVal) => Some(Article(jsVal))
+      case Some(jsVal) => Some(jsVal.as[Article])
       case None => None
     }
   }
 
+  /**
+   * Saves the given article in the DB.
+   */
   def saveArticle(article: Article) = {
-
+    val json = Json.toJson(article)
+    articlesCollection.insert(json)
   }
 
 }

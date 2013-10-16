@@ -20,7 +20,7 @@ object Application extends Controller with MongoController {
   // REST request: get single article by ID
   def findById(id: String) = Action.async {
     val futArticle = ArticleDAO.findById(id)
-    
+
     futArticle.map {
       case Some(article) => Ok(views.html.article(article))
       case None => NotFound(Json.obj("message" -> "No such item"))
@@ -32,11 +32,24 @@ object Application extends Controller with MongoController {
     Ok(views.html.articleEdit(Article.articleForm))
   }
 
-  def articleSave = Action.async { implicit request =>
+  // Form POST request: Submit edit form
+  def articleSubmit = Action.async { implicit request =>
     val boundForm = Article.articleForm.bindFromRequest
+    boundForm.fold(
+      form => Future(BadRequest("Failed")),
+      article => saveArticle(article))
+  }
 
-    
-    Future(Ok(views.html.index("Saved")))
+  // Helper: Try to save the given article in DB
+  def saveArticle(article: Article) = {
+    val futError = ArticleDAO.saveArticle(article)
+    futError.map {
+      lastError =>
+        lastError.inError match {
+          case false => Ok(views.html.index("Saved"))
+          case true => Ok(views.html.index("Error"))
+        }
+    }
   }
 
 }

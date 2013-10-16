@@ -6,7 +6,7 @@
 
     <h1>Edit Article</h1>
 
-    @form(action = routes.Application.articleSave, args = 'id -> "articleform") {
+    @form(action = routes.Application.articleSubmit, args = 'id -> "articleform") {
 
         @inputText(
             field = articleForm("title"),
