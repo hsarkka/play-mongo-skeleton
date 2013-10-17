@@ -8,16 +8,15 @@ import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.modules.reactivemongo.MongoController
 
-object Application extends Controller with MongoController {
+object Application extends Controller with BaseController {
 
   // HTML request: Get front page
   def index = Action {
     Ok(views.html.index("Mongo app is running"))
   }
 
-  // REST request: get single article by ID
+  // HTML request: Get single article by ID
   def findById(id: String) = Action.async {
     val futArticle = ArticleDAO.findById(id)
 
@@ -30,6 +29,18 @@ object Application extends Controller with MongoController {
   // HTML request: Get edit form
   def articleEdit = Action {
     Ok(views.html.articleEdit(Article.articleForm))
+  }
+
+  // HTML request: Get list of articles
+  def articleList = Action.async {
+    val futPublishedArticles = ArticleDAO.getArticles(true)
+    val futUnpublishedArticles = ArticleDAO.getArticles(false)
+
+    for {
+      publishedArticles <- futPublishedArticles
+      unpublishedArticles <- futUnpublishedArticles
+    } yield Ok(views.html.articleList(publishedArticles, unpublishedArticles))
+
   }
 
   // Form POST request: Submit edit form

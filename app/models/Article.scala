@@ -8,7 +8,8 @@ import play.api.libs.functional.syntax._
 /** Article model */
 case class Article(
   title: String,
-  description: String)
+  description: String,
+  published: Boolean)
 
 /** Companion object for article model */
 object Article {
@@ -16,17 +17,20 @@ object Article {
   // Reader from JSON to model object
   implicit val articleRead: Reads[Article] = (
     (JsPath \ "title").read[String] and
-    (JsPath \ "description").read[String])(Article.apply _)
+    (JsPath \ "description").read[String].orElse(Reads.pure("")) and
+    (JsPath \ "published").read[Boolean].orElse(Reads.pure(false)))(Article.apply _)
 
   // Writer from model object to JSON
   implicit val articleWrites: Writes[Article] = (
     (JsPath \ "title").write[String] and
-    (JsPath \ "description").write[String])(unlift(Article.unapply))
+    (JsPath \ "description").write[String] and
+    (JsPath \ "published").write[Boolean])(unlift(Article.unapply))
 
   // Form object
   val articleForm: Form[Article] = Form(
     mapping(
       "title" -> nonEmptyText,
-      "description" -> nonEmptyText)(Article.apply)(Article.unapply))
+      "description" -> nonEmptyText,
+      "published" -> boolean)(Article.apply)(Article.unapply))
 
 }

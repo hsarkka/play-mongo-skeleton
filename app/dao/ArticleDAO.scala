@@ -3,14 +3,26 @@ package dao
 import scala.concurrent.Future
 
 import models.Article
-import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
-import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.collection.JSONCollection
 
+import play.api._
+import play.api.mvc._
+
+// Reactive Mongo imports
+import reactivemongo.api._
+
+// Reactive Mongo plugin
+import play.modules.reactivemongo._
+import play.modules.reactivemongo.json.collection.JSONCollection
+
+// Play Json imports
+import play.api.libs.json._
+
+import play.api.Play.current
 object ArticleDAO extends BaseDAO {
 
   /* 
@@ -33,6 +45,21 @@ object ArticleDAO extends BaseDAO {
     jsValueOptFut.map {
       case Some(jsVal) => Some(jsVal.as[Article])
       case None => None
+    }
+  }
+
+  def getArticles(published: Boolean): Future[List[Article]] = {
+    // DB query
+    val cursor: Cursor[JsObject] = articlesCollection.find(Json.obj("published" -> published)).cursor[JsObject]
+    // Convert cursor to list
+    val futJsonList: Future[List[JsObject]] = cursor.toList
+
+    // Convert JSON objects to model objects
+    futJsonList.map {
+      jsonList =>
+        jsonList.map {
+          jsObj => jsObj.as[Article]
+        }
     }
   }
 

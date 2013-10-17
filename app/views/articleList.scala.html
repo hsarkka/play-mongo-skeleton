@@ -1,0 +1,21 @@
+@(publishedArticles: List[Article], unpublishedArticles: List[Article])
+
+@main(title = "List Articles") {
+
+    <h1>Published Articles</h1>
+
+	<ul>
+	@for(a <- publishedArticles) {
+	  <li>@a.title</li>
+	}
+	</ul>
+
+    <h1>Unpublished Articles</h1>
+
+	<ul>
+	@for(a <- unpublishedArticles) {
+	  <li>@a.title</li>
+	}
+	</ul>
+
+}
