@@ -4,9 +4,12 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import reactivemongo.bson.BSONObjectID
+import play.modules.reactivemongo.json.BSONFormats._
 
 /** Article model */
 case class Article(
+  id: Option[BSONObjectID] = None,
   title: String,
   description: String,
   published: Boolean)
@@ -16,12 +19,14 @@ object Article {
 
   // Reader from JSON to model object
   implicit val articleRead: Reads[Article] = (
+    (JsPath \ "_id").read[Option[BSONObjectID]] and
     (JsPath \ "title").read[String] and
     (JsPath \ "description").read[String].orElse(Reads.pure("")) and
     (JsPath \ "published").read[Boolean].orElse(Reads.pure(false)))(Article.apply _)
 
   // Writer from model object to JSON
   implicit val articleWrites: Writes[Article] = (
+    (JsPath \ "_id").write[Option[BSONObjectID]] and
     (JsPath \ "title").write[String] and
     (JsPath \ "description").write[String] and
     (JsPath \ "published").write[Boolean])(unlift(Article.unapply))
@@ -29,8 +34,12 @@ object Article {
   // Form object
   val articleForm: Form[Article] = Form(
     mapping(
+      "id" -> optional(text),
       "title" -> nonEmptyText,
       "description" -> nonEmptyText,
-      "published" -> boolean)(Article.apply)(Article.unapply))
-
+      "published" -> boolean) {
+        (id, title, description, published) => Article(id.map(new BSONObjectID(_)), title, description, published)
+      } {
+        article => Some { (article.id.map(_.stringify), article.title, article.description, article.published) }
+      })
 }

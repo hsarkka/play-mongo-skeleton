@@ -22,7 +22,7 @@ object Application extends Controller with BaseController {
 
     futArticle.map {
       case Some(article) => Ok(views.html.article(article))
-      case None => NotFound(Json.obj("message" -> "No such item"))
+      case None => NotFound(views.html.notFound())
     }
   }
 
@@ -52,7 +52,7 @@ object Application extends Controller with BaseController {
   }
 
   // Helper: Try to save the given article in DB
-  def saveArticle(article: Article) = {
+  private def saveArticle(article: Article) = {
     val futError = ArticleDAO.saveArticle(article)
     futError.map {
       lastError =>

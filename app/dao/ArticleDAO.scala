@@ -4,25 +4,13 @@ import scala.concurrent.Future
 
 import models.Article
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.modules.reactivemongo.json.collection.JSONCollection
+import reactivemongo.api.Cursor
 
-import play.api._
-import play.api.mvc._
-
-// Reactive Mongo imports
-import reactivemongo.api._
-
-// Reactive Mongo plugin
-import play.modules.reactivemongo._
-import play.modules.reactivemongo.json.collection.JSONCollection
-
-// Play Json imports
-import play.api.libs.json._
-
-import play.api.Play.current
 object ArticleDAO extends BaseDAO {
 
   /* 
