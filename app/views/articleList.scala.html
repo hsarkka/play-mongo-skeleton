@@ -6,7 +6,7 @@
 
 	<ul>
 	@for(a <- publishedArticles) {
-	  <li>@a.title</li>
+	  <li><a href="articleEdit/@a.id.stringify">@a.title</a></li>
 	}
 	</ul>
 
@@ -14,7 +14,7 @@
 
 	<ul>
 	@for(a <- unpublishedArticles) {
-	  <li>@a.title</li>
+	  <li><a href="articleEdit/@a.id.stringify">@a.title</a></li>
 	}
 	</ul>
 

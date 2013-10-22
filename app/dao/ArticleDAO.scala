@@ -56,7 +56,7 @@ object ArticleDAO extends BaseDAO {
    */
   def saveArticle(article: Article) = {
     val json = Json.toJson(article)
-    articlesCollection.insert(json)
+    articlesCollection.save(json)
   }
 
 }

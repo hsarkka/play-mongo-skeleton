@@ -4,11 +4,12 @@ import scala.concurrent.Future
 
 import dao.ArticleDAO
 import models.Article
-import play.api.libs.json.Json
-import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Action
 import play.api.mvc.Controller
 
+/**
+ * Main front-end controller.
+ */
 object Application extends Controller with BaseController {
 
   // HTML request: Get front page
@@ -27,8 +28,21 @@ object Application extends Controller with BaseController {
   }
 
   // HTML request: Get edit form
-  def articleEdit = Action {
-    Ok(views.html.articleEdit(Article.articleForm))
+  def articleEditNew = Action {
+    val filledForm = Article.articleForm.fill(Article())
+    Ok(views.html.articleEdit(filledForm))
+  }
+
+  // HTML request: Get edit form filled with the given article
+  def articleEdit(id: String) = Action.async {
+    val futArticle = ArticleDAO.findById(id)
+
+    futArticle.map {
+      case Some(article) =>
+        val filledForm = Article.articleForm.fill(article)
+        Ok(views.html.articleEdit(filledForm))
+      case None => NotFound(views.html.notFound())
+    }
   }
 
   // HTML request: Get list of articles
@@ -45,13 +59,14 @@ object Application extends Controller with BaseController {
 
   // Form POST request: Submit edit form
   def articleSubmit = Action.async { implicit request =>
+    // Bind request to form object
     val boundForm = Article.articleForm.bindFromRequest
+    // Show form errors, or save if there were no errors
     boundForm.fold(
-      form => Future(BadRequest("Failed")),
+      formWithErrors => Future(BadRequest(views.html.articleEdit(formWithErrors))),
       article => saveArticle(article))
   }
-
-  // Helper: Try to save the given article in DB
+  // Helper: Tries to save the given article. Returns a Result according to success/failure.
   private def saveArticle(article: Article) = {
     val futError = ArticleDAO.saveArticle(article)
     futError.map {

@@ -7,7 +7,8 @@ GET    /                    controllers.Application.index
 
 GET    /articles/:id        controllers.Application.findById(id: String)
 
-GET    /articleEdit         controllers.Application.articleEdit
+GET    /articleEdit         controllers.Application.articleEditNew
+GET    /articleEdit/:id     controllers.Application.articleEdit(id: String)
 POST   /articleSave         controllers.Application.articleSubmit
 GET    /articleList         controllers.Application.articleList
 

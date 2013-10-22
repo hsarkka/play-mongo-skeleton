@@ -9,37 +9,37 @@ import play.modules.reactivemongo.json.BSONFormats._
 
 /** Article model */
 case class Article(
-  id: Option[BSONObjectID] = None,
-  title: String,
-  description: String,
-  published: Boolean)
+  id: BSONObjectID = BSONObjectID.generate,
+  title: String = "",
+  description: String = "",
+  published: Boolean = false)
 
 /** Companion object for article model */
 object Article {
 
   // Reader from JSON to model object
   implicit val articleRead: Reads[Article] = (
-    (JsPath \ "_id").read[Option[BSONObjectID]] and
-    (JsPath \ "title").read[String] and
+    (JsPath \ "_id").read[BSONObjectID] and
+    (JsPath \ "title").read[String].orElse(Reads.pure("")) and
     (JsPath \ "description").read[String].orElse(Reads.pure("")) and
     (JsPath \ "published").read[Boolean].orElse(Reads.pure(false)))(Article.apply _)
 
   // Writer from model object to JSON
   implicit val articleWrites: Writes[Article] = (
-    (JsPath \ "_id").write[Option[BSONObjectID]] and
+    (JsPath \ "_id").write[BSONObjectID] and
     (JsPath \ "title").write[String] and
     (JsPath \ "description").write[String] and
     (JsPath \ "published").write[Boolean])(unlift(Article.unapply))
 
-  // Form object
+  // Form object: Defines form fields and mappings between tuple and model object
   val articleForm: Form[Article] = Form(
     mapping(
-      "id" -> optional(text),
+      "id" -> text,
       "title" -> nonEmptyText,
       "description" -> nonEmptyText,
       "published" -> boolean) {
-        (id, title, description, published) => Article(id.map(new BSONObjectID(_)), title, description, published)
+        (id, title, description, published) => Article(new BSONObjectID(id), title, description, published)
       } {
-        article => Some { (article.id.map(_.stringify), article.title, article.description, article.published) }
+        article => Some((article.id.stringify, article.title, article.description, article.published))
       })
 }
