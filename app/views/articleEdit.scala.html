@@ -8,7 +8,7 @@
 
     @form(action = routes.Application.articleSubmit, args = 'id -> "articleform") {
 
-		<input type='hidden' name='id' value='@articleForm.data.get("id")' />
+        <input type='hidden' name='id' value='@articleForm.data.get("id")' />
 
         @inputText(
             field = articleForm("title"),

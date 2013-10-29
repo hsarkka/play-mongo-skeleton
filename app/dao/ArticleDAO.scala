@@ -11,13 +11,13 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.Cursor
 
+/**
+ * Data Access Object singleton for articles.
+ */
 object ArticleDAO extends BaseDAO {
 
-  /* 
-   * Get a JSONCollection (a Collection implementation that is designed to 
-   * work with JsObject, Reads and Writes.) Note that the `collection` 
-   * is not a "val", but a "def". We do _not_ store the collection reference 
-   * to avoid potential problems in development with Play hot-reloading. 
+  /**
+   * Returns the MongoDB collection used by this DAO.
    */
   def articlesCollection: JSONCollection = db.collection[JSONCollection]("articles")
 
@@ -36,6 +36,9 @@ object ArticleDAO extends BaseDAO {
     }
   }
 
+  /**
+   * Returns the articles that match the given criteria.
+   */
   def getArticles(published: Boolean): Future[List[Article]] = {
     // DB query
     val cursor: Cursor[JsObject] = articlesCollection.find(Json.obj("published" -> published)).cursor[JsObject]

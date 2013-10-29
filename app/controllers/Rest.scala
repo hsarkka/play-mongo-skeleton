@@ -9,12 +9,16 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Action
 import play.api.mvc.Controller
 
+/**
+ * Controller for the REST API.
+ */
 object Rest extends Controller with BaseController {
 
   // REST/JSON request: Get single article by ID
   def findById(id: String) = Action.async {
     val futArticle = ArticleDAO.findById(id)
 
+    // Map possible article into a response
     futArticle.map {
       case Some(article) => Ok(Json.toJson(article))
       case None => NotFound(Json.obj("message" -> "No such item"))
